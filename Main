@@ -1,0 +1,103 @@
+package bullscows;
+
+import java.util.*;
+
+public class Main {
+
+
+    // bulls 公牛🐂  cows 母牛🐮
+
+    private static final Set<String> scSet = new HashSet<>();
+    private static final int secretCode = 3601;
+    private static int currentNum;
+
+    private static int bulls = 0;
+    private static int cows = 0;
+
+    public static void main(String[] args) {
+        // currentNum = new Scanner(System.in).nextInt();
+        // oneTime(currentNum);
+        int len = new Scanner(System.in).nextInt();
+        genSecretCode(len);
+    }
+
+    private static void genSecretCode(int len) {
+        if (len > 10) {
+            System.out.println("Error: can't generate a secret number with a length of 11 because there aren't enough unique digits.");
+            return;
+        }
+
+        StringBuilder sc = createSC(len);
+        while (!SCisOnly(sc)) {
+            sc.replace(0, len, Objects.requireNonNull(createSC(len)).toString());
+        }
+
+        System.out.println("The random secret number is "+ sc +".");
+    }
+
+    private static boolean SCisOnly(StringBuilder sc) {
+        if (!scSet.contains(sc.toString())) {
+            scSet.add(sc.toString());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static StringBuilder createSC(int len) {
+        long pseudoRandomNumber = System.nanoTime();
+        StringBuilder sc = new StringBuilder(String.valueOf(pseudoRandomNumber)).reverse();
+        String currentSC = sc.substring(0, len);
+
+        return new StringBuilder(currentSC);
+    }
+
+
+    private static void graderCows() {
+        int tempC = currentNum;
+        // 将current转换成数组
+        int[] tempArr = new int[String.valueOf(tempC).length()];
+        int index = tempArr.length - 1;
+        while(tempC > 0) {
+            tempArr[index] = tempC % 10;
+            tempC /= 10;
+            index--;
+        }
+
+        // 看在密码中存不存在
+        for (int foo :
+                tempArr) {
+            if (String.valueOf(secretCode).contains(String.valueOf(foo))) {
+                cows += 1;
+            }
+        }
+    }
+
+    private static void graderBulls() {
+        String[] cArr = String.valueOf(currentNum).split("");
+        String[] sArr = String.valueOf(secretCode).split("");
+
+        int index = sArr.length-1;
+        while (index >= 0) {
+            if (cArr[index].equals(sArr[index])) {
+                bulls += 1;
+            }
+            index--;
+        }
+    }
+
+    public static void oneTime(int current) {
+        graderCows();
+        graderBulls();
+        System.out.println(statusOnPattern());
+        bulls = 0;
+        cows = 0;
+    }
+
+    public static String statusOnPattern() {
+        if (bulls == 0 && cows == 0)
+            return "Grade: None. The secret code is "+secretCode+".";
+        else
+            return "Grade: " + bulls + " bull(s) and " + (cows - bulls) + " cow(s). The secret code is "+secretCode+".";
+    }
+}
